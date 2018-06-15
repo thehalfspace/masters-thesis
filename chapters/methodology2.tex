@@ -1,0 +1,120 @@
+\onehalfspacing
+We use the genetic algorithm in order to classify the fault-slip observations into its respective stress regimes. Genetic algorithm is a heuristic search technique adapted from the Darwinian theory of natural selection, and is quite often used in nonlinear optimization problems (Holland, 1975; Goldberg, 1989; Sen and Stoffa, 1995). A few methods use k-means cluster analysis in combination with the genetic algorithm (Liu et al., 2011) for classification, but to the best of our knowledge, the genetic algorithm itself has never been used to separate and invert the data simultaneously. 
+
+If we referring back to Section 2.2 and 2.3, Chapter 2, we can recall that the input parameters for the inversion are normal and slip vectors, $\bm{n}$ and $\bm{s}$ and the output parameters are the three Euler angles ($\alpha$, $\beta$, $\gamma$) and the stress ellipsoid ratio ($\phi$). We will collectively refer to this output parameter set as $O$ ($ = [\alpha, \beta, \gamma, \phi]^T$).
+
+\section{Observations Containing $M$ Phases of Stresses}
+Let the $N$ number of input parameters belong to $M$ phases of multiple stress tensors. Our task is to classify each of these $N$ input parameters into one of the $M$ stress tensors, using the misfit criteria. We begin with an initial set of possible solutions (initialization), calculate their misfit, and perform the genetic operations elitism, selection, encoding, crossover and mutation iteratively. Each of these steps is described in brief below.
+
+\subsection{Initialization}
+Initialization involves randomly generating a large number of output parameters, $O$, in their domain, defined in Section 2.3, Chapter 2. This is called the initial population, and its size is called the population size. In the GAPS, the initial population, $\bm{P}$, is a column vector of length $L$, the population size.
+\begin{equation} \label{18}
+\bm{P} =
+\begin{bmatrix}
+\bm{P_1} \\
+\vdots \\
+\bm{P_i} \\
+\vdots \\
+\bm{P_L}
+\end{bmatrix}.
+\end{equation}
+
+Each member of this initial population is a row vector with $M$ rows, corresponding to the number of phases in the data. The elements of this row vector are randomly initialized output parameters $O$. Thus, the $i^{th}$ member of the initial population $\bm{P_i}$, is:
+\begin{equation} \label{19}
+\bm{P_i} = 
+\begin{bmatrix}
+O_1 & \dots & O_M
+\end{bmatrix}.
+\end{equation}
+
+We compute the stress tensor corresponding to each output parameter set $O$.
+
+\subsection{Misfit Calculation}
+The next step is to calculate the misfit of each member of the initial population. The $i^{th}$ row of the initial population has $M$ stress tensors. We use Eq. (17) to obtain the misfit of each input parameter set with respect to each of the $M$ stress tensors. We define an $N \times M$ matrix called the Data Misfit Matrix ($\bm{DMM}$), for one member of the initial population, as follows:
+\begin{equation} \label{20}
+\bm{DMM} = 
+\begin{bmatrix}
+F_{11} & \dots & F_{1M}\\
+\vdots & \ddots & \vdots\\
+F_{N1} & \dots & F_{NM}
+\end{bmatrix}.
+\end{equation}
+
+Each element of this matrix is the function $F$ defined for a particular observation and a particular stress phase. In order to classify each observation into one of the $M$ stress tensors, we define an Index Matrix, $\bm{IM}$, as follows:
+\begin{equation} \label{21}
+IM_{ij} = \left\{
+\begin{matrix}
+ 1 & if DMM_{ij} = \displaystyle \min_{j \in M} DMM_{ij},\\
+ 0 & otherwise.
+\end{matrix} \right
+\end{equation}
+
+Note that each row of the index matrix will have only one non-zero element, since each observation can belong to only one stress phase. The number of non-zero elements in $j^{th}$ column of the $\bm{IM}$ is the number of observations belonging to the $j^{th}$ stress tensor. This is the initial separation of observations, after the first iteration. Next, we calculate the element-wise product of the matrices $\bm{DMM}$ and $\bm{IM}$ to obtain a matrix $\bm{EP}$:
+\begin{equation} \label{22}
+EP_{ij} = DMM_{ij} \times IM_{ij}. 
+\end{equation}
+
+Now, we take the mean of all the non-zero elements in each column of $\bm{EP}$, and add them to obtain a single value. This is called the composite misfit ($CM$) for one member of the initial population.
+\begin{equation} \label{23}
+CM = \displaystyle \sum_{i=1}^{M}\left[ \frac{\displaystyle \sum_{j=1}^{N}EP_{ij}}{\displaystyle \sum_{j=1}^{N}IM_{ij}}\right].
+\end{equation}
+
+We compute the composite misfit for each member of the initial population. This gives us a vector of length $L$, called the Composite Misfit Vector ($\bm{CMV}$). Next, we sort the $\bm{CMV}$ in increasing order of the composite misfit values. The individual having a lower value is considered a better fit individual and is preferred over the one having a higher value.
+
+\subsection{Elitism}
+The top 5\% best fit individuals, having the lowest composite misfit values, are given the privilege of going directly to the next generation. This step, called `elitism`, helps in faster convergence of the solution and also ensures that the best solution is always carried on to the next iteration. The number `5\%` is arbitrary, and it is best decided by forward modelling by using a variety of synthetic data sets to design the algorithm.
+
+\subsection{Selection}
+From the remaining 95\%, we select random pair of individuals and compare their fitness. The one with smaller misfit is considered a better fit individual and is chosen to reproduce. This process is called tournament selection. Tournaments are played $0.95*L$ times so that we have 0.95*L winners for reproduction. The set of winners is referred to as the mating pool.
+
+\subsection{Encoding}
+The individuals in the mating pool are referred to as parents, and they undergo reproduction via the processes of crossover and mutation, to produce new offspring. These processes of the genetic algorithm operate on binary encoded values of the mating pool. The length of the binary numbers depends on the desired resolvability of the components of O. Assuming each component of O has $b$ binary bits, we divide their ranges (Section 2.3, Chapter 2) into $2^b$ equal parts, and obtain a binary equivalent of the real values. This binary equivalent of the mating pool is also referred to as the mating pool. For our problem, we assume the value of $b = 6$.
+
+\subsection{Crossover and Mutation}
+Crossover and mutation alter the bits in the parents to produce new offspring. These operations are analogous to the genetic reproduction in living beings, where the child (offspring) inherits certain characteristics of both the parents.
+
+Crossover operates on two parents, selected randomly from the mating pool, where we interchange the bits between a selected common crossover site on both the parents (Fig. 4A-B). This process allows the algorithm to explore the search space without performing an exhaustive grid search. The probability of occurrence of crossover in the GAPS is 60\%. 
+
+Mutation makes changes to a single parent, by flipping a randomly selected bit from 1 to 0 or 0 to 1 with a very low probability (Fig. 4B-C). This adds randomness to the algorithm, and prevents it from converging too fast. It also results in the solution not getting entrapped in a locally optimum solution, which is prominent if the convergence is too fast. 
+
+This entire process is repeated iteratively, till the population converges and the misfit stabilizes (Fig. 5). In essence, we are attempting to find those tensors which give minimum possible misfit for N number of different data permutations. This ensures that we are selectively minimizing the input vectors, and the algorithm converges to the point where the sum of misfits is minimum for each phase.
+
+\begin{table}[h!]
+\centering
+\footnotesize
+ \renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l l}
+    \hline
+    Symbol & Explanation \\
+    \hline
+    $DC$ & Direction Cosine \\
+    $\bm{n}$ & Normal Vector \\
+    $\bm{s}$ & Slip Vector \\
+    $\alpha$, $\beta$, $\gamma$ & Euler Angles \\
+    $\phi$ & Stress Ellipsoid Ratio \\
+    $\bm{\sigma}$ & Stress Tensor \\
+    $\bm{\sigma_s}$ & Shear Stress Direction \\
+    $M$ & Misfit Angle \\
+    $G$ & Angular Misfit Function \\
+    $H$ & Magnitude Misfit Function \\
+    $F$ & Misfit Function used in this Study\\
+    $\bm{P}$ & Initial Population \\
+    $L$ & Population Size \\
+    $M$ & Number of Phases \\
+    $N$ & Number of Observations \\
+    $i, j, k$ & Indices of Matrix, Vector \\
+    $\bm{DMM}$ & Data Misfit Matrix \\
+    $\bm{IM}$ & Index Matrix \\
+    $\bm{EP}$ & Element-wise Product of $\bm{DMM}$ and $\bm{IM}$ \\
+    $CM$ & Composite Misfit \\
+    $\bm{CMV}$ & Composite Misfit Vector \\
+    \hline
+\end{tabular}
+\caption{List of symbols and their meanings.}
+\label{table:1}
+\end{table}
+
+\section{Determining the Number of Phases}
+In the real geological conditions, the number of phases of faulting is usually not known. But for a reasonably realistic condition, this number does not exceed 7 (Shan et al., 2007), and is often around 2-3. In order to determine the number of clusters or phases of faulting events, we run the algorithm successively for 1, 2, 3 phases. Then we compare the mean composite misfit value for each algorithm run. At the optimum number of clusters, the mean composite misfit will have a minimum value.
+
+Another observation made during the test is that when we run the algorithm assuming a larger number of phases than what is present in the data, we often find that one of the phases of separation contains less than four input vectors, giving meaningless inversion results. This can be used as an identifier to determine the number of phases in a much faster way rather than testing it for the different number of phases sequentially. This of course assumes that there are no outliers in the data and we have at least four observations of each phase of stress tensor.

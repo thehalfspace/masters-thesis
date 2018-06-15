@@ -1,0 +1,188 @@
+\documentclass[12pt, oneside]{book}
+\usepackage[utf8]{inputenc}
+\usepackage{import}
+\usepackage[font=footnotesize,labelfont=bf]{caption}
+\usepackage{example}
+\usepackage{makeidx}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{hanging}
+\usepackage{bm}
+\usepackage{pdflscape}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage[a4paper,width=150mm,top=30mm,bottom=30mm,bindingoffset=6mm]{geometry}
+\usepackage{setspace}
+
+\usepackage{chngcntr}
+\counterwithout{equation}{chapter} % continuous equation numbering
+\counterwithout{figure}{chapter}    %continuous figure numbering
+\counterwithout{table}{chapter}     %continuous table numbering
+
+\graphicspath{ {images/} }
+\pagestyle{fancy}
+\setlength{\parskip}{1em}
+
+\author{Prithvi Thakur}
+\date{2015-16}
+
+\begin{document}
+\input{title.tex}
+
+\frontmatter
+
+\chapter{Declaration of Authorship}
+ \textit{I hereby solemnly declare the work presented in this dissertation, entitled \textbf{"New methods for paleostress analysis from fault-slip data"} in partial fulfilment of the requirements for the award of the degree of \textbf{'Integrated Master of Technology'} in \textbf{Geological Technology} submitted to the \textbf{Department of Earth Sciences, Indian Institute of Technology Roorkee,} is an authentic record of my own work carried out during the period June 2015 to May 2016, under the supervision of \textbf{Prof. D.C. Srivastava} and \textbf{Prof. P.K. Gupta}, Department of Earth Sciences, I.I.T. Roorkee.}
+ 
+ \textit{The matter embodied in this dissertation has not been submitted by me for the award of any other degree or any other institute.}
+
+\vspace{1cm}
+    
+\begin{tabular}{l l r}
+    \textbf{Date:} & & \\
+    \textbf{Place: Roorkee} &\hspace{5.1cm} & \textbf{(PRITHVI THAKUR)} 
+\end{tabular}
+
+\hrulefill %[1em]{25em}{0.5pt}  
+
+\textit{This is to certify that the above statement made by the candidate is correct to the best of my knowledge.}
+
+\small
+\begin{flushleft}
+\vspace{0.5cm}
+\begin{tabular}{l r}
+\textbf{D. C. Srivastava} & \hspace{1cm} \textbf{P. K. Gupta} \\
+Professor and Head & \hspace{1cm} Professor \\
+Department of Earth Sciences & \hspace{1cm} Department of Earth Sciences \\
+Indian Institute of Technology Roorkee & \hspace{1cm} Indian Institute of Technology Roorkee \\
+Roorkee-247667 (Uttarakhand) & \hspace{1cm} Roorkee-247667 (Uttarakhand) \\
+\end{tabular}
+\end{flushleft}
+
+
+\clearpage  % Declaration ended, now start a new page
+
+\onehalfspacing
+\chapter{Acknowledgements}
+I owe my greatest debt to my thesis advisors, Prof. Deepak C. Srivastava and Prof. Pravin K. Gupta of the Department of Earth Sciences, Indian Institute of Technology Roorkee. I am thankful to Prof. DCS for giving me the opportunity to work in his lab as a Master's student, and for providing me with such an interesting problem to work on. Prof. PKG has helped me formulate the mathematics of the problem, for which I am thankful. Without their constant assistance, encouragement, and patience this project would not have been possible. I greatly benefited from my association with them.
+
+I am also thankful to the following people for their assistance:
+
+Dr. Richard Lisle and Dr. Michal Nemcok helped me with the theory for creating synthetic data sets. Dr. Richard Lisle,  Dr. Lothar Ratschbacher, Dr. Blanka Sperner, Dr. Steven Wojtal and an anonymous reviewer reviewed the manuscript prepared from this work, and provided helpful suggestions. Dr. Bernard Celerier helped me with the concepts of Euler angle rotations, and provided some inaccessible research papers. My labmates, Arun Ojha and Kartik Bhatnagar, participated in discussions which led to the improvement of my code and the manuscript. 
+
+Special thanks to Abhishek Prakash, Ankit Bhandari, Harsh Anurag, Rishika Sinha, Surya Lahoti, Nagesh Joshi, Rohit Raj, Ayush Agrawal, Ripul Dutt and all my colleagues, batchmates and friends for actually listening to me when I talked about paleostress Analysis, and providing me with invaluable support throughout.
+
+Research leading to this thesis was partially supported by the Ministry of Human Resources and Development research assistantship from Indian Institute of Technology Roorkee, and by occasional loans of cash from my parents.
+
+\clearpage  % Declaration ended, now start a new page
+
+%% ----------------------------------------------------------------
+% The "Funny Quote Page"
+\pagestyle{empty}  % No headers or footers for the following pages
+
+\null\vfill
+% Now comes the "Funny Quote", written in italics
+\textit{``Dedicated to Mom, Dad and Kshitij.''}
+
+\vfill\vfill\vfill\vfill\vfill\vfill\null
+\clearpage  % Funny Quote page ended, start a new page
+%% ----------------------------------------------------------------
+
+\onehalfspacing
+\chapter{Abstract}
+Estimating the regional stress state from geological or geophysical observations is one of the fundamental objectives of any tectonic study. Stress inversion is a nonlinear problem, but is commonly solved by linearization under certain assumptions. These algorithms not only oversimplify the problem but are also vulnerable to entrapment of the solution in a local optimum. We propose a nonlinear heuristic technique, the genetic algorithm, that searches the global optimum without making any linearizing assumption or simplification. The method mimics the natural evolutionary process of selection, crossover, mutation, and minimises the composite misfit function for searching the global optimum, the fittest stress tensor. The validity of the method is successfully demonstrated on synthetic fault-slip observations in different tectonic settings and also in situations where the observations contain noisy data. These results are compared with those obtained from the other common methods. The genetic algorithm method is superior to other common methods, in particular, in the oblique tectonic settings where none of the principal stresses is directed vertically.
+
+Separation of polyphase fault-slip data is another fundamental problem yet to be addressed satisfactorily. Although distinct overprinting relationships between different phases of striated faults is the most reliable criteria for classification of the the fault-sets, such outcrops are rather uncommon. We propose an objective method that uses novel application of genetic algorithm for separation of heterogeneous fault-slip observations into homogeneous sets. We have reformulated the clustering problem as a nonlinear inversion problem, and we use the heuristic search method of genetic algorithm to minimize the sum of mean misfits in each phase of faulting. This technique requires no input from the user to determine the number of stress tensors present in the data, and is free from bias. We demonstrate this technique on two sets of artificially mixed synthetic fault-slip data, one where the orientations of the stress tensors are similar, and another with relatively uneven number of faults in each subgroup. A third demonstration on a single phase synthetic fault-slip data shows how to determine the number of phases in an unknown data set. 
+\tableofcontents
+
+\listoffigures
+
+\listoftables
+
+\mainmatter
+
+\fancyhead{}  % Clears all page headers and footers
+\pagestyle{fancy}
+\rhead{\thepage}  % Sets the right side header to show the page number
+\cfoot{}
+
+\cleardoublepage
+\begingroup
+  \makeatletter
+  \let\ps@plain\ps@empty
+  \part{ Stress Inversion Using the Genetic Algorithm}
+\endgroup
+
+\chapter{Introduction}
+\lhead{\emph{1. Introduction}}
+\thispagestyle{empty}
+\input{chapters/introduction.tex}
+
+\chapter{Formulation of the Inverse Problem}
+\lhead{\emph{2. Formulation of the Inverse Problem}}
+\thispagestyle{empty}
+\input{chapters/theory.tex}
+
+\chapter{GA Methodology}
+\lhead{\emph{3. GA Methodology}}
+\thispagestyle{empty}
+\input{chapters/methodology.tex}
+
+\chapter{Validation of the GA Inversion}
+\lhead{\emph{4. Validation of the GA Inversion}}
+\thispagestyle{empty}
+\input{chapters/results.tex}
+
+\cleardoublepage
+\begingroup
+  \makeatletter
+  \let\ps@plain\ps@empty
+  \part{Separation of Polyphase Fault-slip data using the Genetic Algorithm}
+\endgroup
+
+\chapter{Introduction}
+\lhead{\emph{5. Introduction}}
+\thispagestyle{empty}
+\input{chapters/intro2.tex}
+
+\chapter{Methodology}
+\lhead{\emph{6. Methodology}}
+\thispagestyle{empty}
+\input{chapters/methodology2.tex}
+
+\chapter{Results}
+\lhead{\emph{7. Results}}
+\thispagestyle{empty}
+\input{chapters/results2.tex}
+
+\chapter{Summary and Conclusions}
+\lhead{\emph{8. Summary and Conclusions}}
+\thispagestyle{empty}
+\input{chapters/conclusion.tex}
+
+\appendix
+\chapter*{Appendix: A Working Example of GA inversion on fault-slip observations}
+\addcontentsline{toc}{chapter}{Appendix}
+\renewcommand{\thesection}{A.\arabic{section}}
+\lhead{\emph{Appendix}}
+\thispagestyle{empty}
+\input{chapters/appendix1.tex}
+
+\chapter*{Manuscripts Prepared}
+\addcontentsline{toc}{chapter}{Manuscripts Prepared}
+\lhead{\emph{Manuscripts}}
+\thispagestyle{empty}
+\input{chapters/ms.tex}
+
+
+\chapter*{References}
+\addcontentsline{toc}{chapter}{References}
+\lhead{\emph{References}}
+\thispagestyle{empty}
+\input{chapters/references.tex}
+
+
+\end{document}
