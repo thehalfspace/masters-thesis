@@ -1,2 +1,2 @@
 # thesis
-Tex files for my thesis at IIT-R
+Tex files for my undergrad+masters thesis at IIT-R
